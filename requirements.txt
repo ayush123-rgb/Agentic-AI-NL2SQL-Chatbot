@@ -1,0 +1,6 @@
+fastapi
+groq
+pandas
+python-dotenv
+tabulate
+uvicorn

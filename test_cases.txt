@@ -1,0 +1,140 @@
+
+TEST CASE 1
+-------------------------------------------------
+Input:
+Show all products
+
+Expected Output:
+Displays all products from products table
+
+
+TEST CASE 2
+-------------------------------------------------
+Input:
+Show top 10 expensive products
+
+Expected Output:
+Displays products with highest price
+from order_items table
+
+
+TEST CASE 3
+-------------------------------------------------
+Input:
+Show all customers
+
+Expected Output:
+Displays customer details from customers table
+
+
+TEST CASE 4
+-------------------------------------------------
+Input:
+Show all canceled orders
+
+Expected Output:
+Displays orders where order_status
+is canceled
+
+
+TEST CASE 5
+-------------------------------------------------
+Input:
+Show payment types
+
+Expected Output:
+Displays all available payment methods
+
+
+TEST CASE 6
+-------------------------------------------------
+Input:
+Show customers with more than
+3 payment installments
+
+Expected Output:
+Displays customer states having
+payments with installments > 3
+
+
+TEST CASE 7
+-------------------------------------------------
+Input:
+Show average payment value
+
+Expected Output:
+Displays average payment amount
+
+
+TEST CASE 8
+-------------------------------------------------
+Input:
+Show top 5 payment values
+
+Expected Output:
+Displays highest payment values
+
+
+TEST CASE 9
+-------------------------------------------------
+Input:
+Show products with shipping charges
+greater than 50
+
+Expected Output:
+Displays products having shipping
+charges greater than 50
+
+
+TEST CASE 10
+-------------------------------------------------
+Input:
+Show total number of customers
+
+Expected Output:
+Displays total customer count
+
+
+TEST CASE 11
+-------------------------------------------------
+Input:
+DROP TABLE products;
+
+Expected Output:
+Unsafe SQL Query Blocked
+
+
+TEST CASE 12
+-------------------------------------------------
+Input:
+DELETE FROM customers;
+
+Expected Output:
+Unsafe SQL Query Blocked
+
+
+TEST CASE 13
+-------------------------------------------------
+Input:
+Show all orders sorted by purchase date
+
+Expected Output:
+Displays orders sorted chronologically
+
+
+TEST CASE 14
+-------------------------------------------------
+Input:
+Show all payment installments
+
+Expected Output:
+Displays payment installment details
+
+
+TEST CASE 15
+-------------------------------------------------
+Input:
+Show customer states
+
+Expected Output:
+Displays distinct customer states

@@ -1,0 +1,317 @@
+{
+  "tables": [
+    {
+      "name": "products",
+      "description": "Product catalog containing product identifiers, categories, and package dimensions.",
+      "columns": [
+        {
+          "name": "product_id",
+          "type": "TEXT",
+          "description": "Unique identifier for each product.",
+          "unit": null
+        },
+        {
+          "name": "product_category_name",
+          "type": "TEXT",
+          "description": "Category or product family name.",
+          "unit": null
+        },
+        {
+          "name": "product_weight_g",
+          "type": "REAL",
+          "description": "Product weight.",
+          "unit": "grams"
+        },
+        {
+          "name": "product_length_cm",
+          "type": "REAL",
+          "description": "Product package length.",
+          "unit": "centimeters"
+        },
+        {
+          "name": "product_height_cm",
+          "type": "REAL",
+          "description": "Product package height.",
+          "unit": "centimeters"
+        },
+        {
+          "name": "product_width_cm",
+          "type": "REAL",
+          "description": "Product package width.",
+          "unit": "centimeters"
+        }
+      ],
+      "sample_data": [
+        {
+          "product_id": "90K0C1fIyQUf",
+          "product_category_name": "toys",
+          "product_weight_g": 491.0,
+          "product_length_cm": 19.0,
+          "product_height_cm": 12.0,
+          "product_width_cm": 16.0
+        },
+        {
+          "product_id": "qejhpMGGVcsl",
+          "product_category_name": "watches_gifts",
+          "product_weight_g": 440.0,
+          "product_length_cm": 18.0,
+          "product_height_cm": 14.0,
+          "product_width_cm": 17.0
+        },
+        {
+          "product_id": "qUS5d2pEAyxJ",
+          "product_category_name": "costruction_tools_garden",
+          "product_weight_g": 2200.0,
+          "product_length_cm": 16.0,
+          "product_height_cm": 16.0,
+          "product_width_cm": 16.0
+        }
+      ]
+    },
+    {
+      "name": "orders",
+      "description": "Order records with customer ownership, order status, purchase approval, delivery, and estimated delivery timestamps.",
+      "columns": [
+        {
+          "name": "order_id",
+          "type": "TEXT",
+          "description": "Unique identifier for each order.",
+          "unit": null
+        },
+        {
+          "name": "customer_id",
+          "type": "TEXT",
+          "description": "Customer identifier linked to the customers table.",
+          "unit": null
+        },
+        {
+          "name": "order_status",
+          "type": "TEXT",
+          "description": "Current order state such as delivered or canceled.",
+          "unit": null
+        },
+        {
+          "name": "order_purchase_timestamp",
+          "type": "TEXT",
+          "description": "Date and time when the order was purchased.",
+          "unit": "timestamp"
+        },
+        {
+          "name": "order_approved_at",
+          "type": "TEXT",
+          "description": "Date and time when the order was approved.",
+          "unit": "timestamp"
+        },
+        {
+          "name": "order_delivered_timestamp",
+          "type": "TEXT",
+          "description": "Date and time when the order was delivered.",
+          "unit": "timestamp"
+        },
+        {
+          "name": "order_estimated_delivery_date",
+          "type": "TEXT",
+          "description": "Estimated delivery date for the order.",
+          "unit": "date"
+        }
+      ],
+      "sample_data": [
+        {
+          "order_id": "Axfy13Hk4PIk",
+          "customer_id": "hCT0x9JiGXBQ",
+          "order_status": "delivered",
+          "order_purchase_timestamp": "2017-10-22 18:57:54",
+          "order_approved_at": "2017-10-22 19:14:13",
+          "order_delivered_timestamp": "2017-10-26 22:19:52",
+          "order_estimated_delivery_date": "2017-11-09"
+        },
+        {
+          "order_id": "v6px92oS8cLG",
+          "customer_id": "PxA7fv9spyhx",
+          "order_status": "delivered",
+          "order_purchase_timestamp": "2018-06-20 21:40:31",
+          "order_approved_at": "2018-06-20 22:20:20",
+          "order_delivered_timestamp": "2018-07-03 22:51:22",
+          "order_estimated_delivery_date": "2018-07-24"
+        },
+        {
+          "order_id": "Ulpf9skrhjfm",
+          "customer_id": "g3nXeJkGI0Qw",
+          "order_status": "delivered",
+          "order_purchase_timestamp": "2018-02-16 16:19:31",
+          "order_approved_at": "2018-02-17 16:15:35",
+          "order_delivered_timestamp": "2018-02-27 01:29:50",
+          "order_estimated_delivery_date": "2018-03-08"
+        }
+      ]
+    },
+    {
+      "name": "payments",
+      "description": "Payment records for orders, including payment method, installment count, and paid amount.",
+      "columns": [
+        {
+          "name": "order_id",
+          "type": "TEXT",
+          "description": "Order identifier linked to the orders table.",
+          "unit": null
+        },
+        {
+          "name": "payment_sequential",
+          "type": "INTEGER",
+          "description": "Sequence number for payments when an order has multiple payment events.",
+          "unit": "count"
+        },
+        {
+          "name": "payment_type",
+          "type": "TEXT",
+          "description": "Payment method used for the order.",
+          "unit": null
+        },
+        {
+          "name": "payment_installments",
+          "type": "INTEGER",
+          "description": "Number of installments used for the payment.",
+          "unit": "count"
+        },
+        {
+          "name": "payment_value",
+          "type": "REAL",
+          "description": "Total payment amount.",
+          "unit": "currency amount; currency not specified in dataset"
+        }
+      ],
+      "sample_data": [
+        {
+          "order_id": "Axfy13Hk4PIk",
+          "payment_sequential": 1,
+          "payment_type": "credit_card",
+          "payment_installments": 1,
+          "payment_value": 259.14
+        },
+        {
+          "order_id": "v6px92oS8cLG",
+          "payment_sequential": 1,
+          "payment_type": "credit_card",
+          "payment_installments": 8,
+          "payment_value": 382.39
+        },
+        {
+          "order_id": "Ulpf9skrhjfm",
+          "payment_sequential": 1,
+          "payment_type": "credit_card",
+          "payment_installments": 4,
+          "payment_value": 249.25
+        }
+      ]
+    },
+    {
+      "name": "order_items",
+      "description": "Line-item level order data connecting orders, products, sellers, item prices, and shipping charges.",
+      "columns": [
+        {
+          "name": "order_id",
+          "type": "TEXT",
+          "description": "Order identifier linked to the orders table.",
+          "unit": null
+        },
+        {
+          "name": "product_id",
+          "type": "TEXT",
+          "description": "Product identifier linked to the products table.",
+          "unit": null
+        },
+        {
+          "name": "seller_id",
+          "type": "TEXT",
+          "description": "Identifier of the seller for the order item.",
+          "unit": null
+        },
+        {
+          "name": "price",
+          "type": "REAL",
+          "description": "Item sale price.",
+          "unit": "currency amount; currency not specified in dataset"
+        },
+        {
+          "name": "shipping_charges",
+          "type": "REAL",
+          "description": "Shipping charge for the order item.",
+          "unit": "currency amount; currency not specified in dataset"
+        }
+      ],
+      "sample_data": [
+        {
+          "order_id": "Axfy13Hk4PIk",
+          "product_id": "90K0C1fIyQUf",
+          "seller_id": "ZWM05J9LcBSF",
+          "price": 223.51,
+          "shipping_charges": 84.65
+        },
+        {
+          "order_id": "v6px92oS8cLG",
+          "product_id": "qejhpMGGVcsl",
+          "seller_id": "IjlpYfhUbRQs",
+          "price": 170.8,
+          "shipping_charges": 23.79
+        },
+        {
+          "order_id": "Ulpf9skrhjfm",
+          "product_id": "qUS5d2pEAyxJ",
+          "seller_id": "77p2EYxcM9MD",
+          "price": 64.4,
+          "shipping_charges": 17.38
+        }
+      ]
+    },
+    {
+      "name": "customers",
+      "description": "Customer location table containing customer identifiers, zip code prefixes, cities, and states.",
+      "columns": [
+        {
+          "name": "customer_id",
+          "type": "TEXT",
+          "description": "Unique identifier for each customer.",
+          "unit": null
+        },
+        {
+          "name": "customer_zip_code_prefix",
+          "type": "INTEGER",
+          "description": "Customer zip code prefix.",
+          "unit": null
+        },
+        {
+          "name": "customer_city",
+          "type": "TEXT",
+          "description": "Customer city.",
+          "unit": null
+        },
+        {
+          "name": "customer_state",
+          "type": "TEXT",
+          "description": "Customer state abbreviation.",
+          "unit": null
+        }
+      ],
+      "sample_data": [
+        {
+          "customer_id": "hCT0x9JiGXBQ",
+          "customer_zip_code_prefix": 58125,
+          "customer_city": "varzea paulista",
+          "customer_state": "SP"
+        },
+        {
+          "customer_id": "PxA7fv9spyhx",
+          "customer_zip_code_prefix": 3112,
+          "customer_city": "armacao dos buzios",
+          "customer_state": "RJ"
+        },
+        {
+          "customer_id": "g3nXeJkGI0Qw",
+          "customer_zip_code_prefix": 4119,
+          "customer_city": "jandira",
+          "customer_state": "SP"
+        }
+      ]
+    }
+  ]
+}
