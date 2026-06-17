@@ -7,7 +7,11 @@ from modules.schema_extractor import schema
 client = Groq(api_key=API_KEY)
 
 
-def generate_sql_query(user_query):
+def generate_sql_query(user_query, session_context=None):
+    context_text = "No active session context."
+
+    if session_context:
+        context_text = session_context.to_prompt_text()
 
     
     prompt = f"""
@@ -33,6 +37,10 @@ IMPORTANT RULES:
 13. Use LIMIT whenever suitable
 14. Avoid unnecessary columns
 15. Generate efficient queries
+16. Use the session context for ambiguous follow-up questions.
+17. If the current user question explicitly mentions a table or topic,
+    prioritize that new topic over the previous context.
+18. Do not query internal backend tables used for chatbot history.
 
 DATABASE SCHEMA:
 
@@ -47,6 +55,10 @@ payments.order_id = orders.order_id
 order_items.order_id = orders.order_id
 
 order_items.product_id = products.product_id
+
+SESSION CONTEXT:
+
+{context_text}
 
 USER QUESTION:
 

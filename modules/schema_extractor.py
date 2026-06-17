@@ -2,6 +2,7 @@ import json
 import sqlite3
 
 from config.config import DATABASE_PATH, METADATA_PATH
+from modules.chat_history import INTERNAL_TABLES
 
 
 def load_metadata():
@@ -54,6 +55,10 @@ def extract_schema_from_database():
 
     for table in tables:
         table_name = table[0]
+
+        if table_name in INTERNAL_TABLES:
+            continue
+
         schema_lines.append(f"TABLE: {table_name}")
         schema_lines.append("Columns:")
 
