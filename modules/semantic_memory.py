@@ -4,6 +4,7 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from config.config import DATABASE_PATH
+from modules.chat_history import ensure_query_memory_table
 
 model = SentenceTransformer(
     "all-MiniLM-L6-v2"
@@ -11,43 +12,41 @@ model = SentenceTransformer(
 
 def find_similar_query(
     user_query,
-    threshold=0.90
+    threshold=0.90,
+    history_limit=500
 ):
-    query_embedding = model.encode(
-        [user_query]
-    )
-
     with sqlite3.connect(DATABASE_PATH) as conn:
+        ensure_query_memory_table(conn)
 
         rows = conn.execute(
-            """
+            f"""
             SELECT
                 user_input,
                 generated_sql,
                 output_response
             FROM query_memory
+            ORDER BY id DESC
+            LIMIT {int(history_limit)}
             """
         ).fetchall()
 
-    best_match = None
-    best_score = 0
+    if not rows:
+        return None
 
-    for row in rows:
+    query_embedding = model.encode(
+        [user_query]
+    )
+    stored_embeddings = model.encode(
+        [row[0] for row in rows]
+    )
+    similarity_scores = cosine_similarity(
+        query_embedding,
+        stored_embeddings
+    )[0]
 
-        stored_input = row[0]
-
-        stored_embedding = model.encode(
-            [stored_input]
-        )
-
-        score = cosine_similarity(
-            query_embedding,
-            stored_embedding
-        )[0][0]
-
-        if score > best_score:
-            best_score = score
-            best_match = row
+    best_index = int(similarity_scores.argmax())
+    best_score = float(similarity_scores[best_index])
+    best_match = rows[best_index]
 
     if best_score >= threshold:
 

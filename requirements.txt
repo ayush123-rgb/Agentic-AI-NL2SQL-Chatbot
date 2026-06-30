@@ -2,5 +2,13 @@ fastapi
 groq
 pandas
 python-dotenv
+scikit-learn
+sentence-transformers
 tabulate
 uvicorn
+'''
+SELECT AVG(payment_value) FROM payments;
+
+show average payment value;
+
+'''

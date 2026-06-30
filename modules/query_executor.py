@@ -7,6 +7,7 @@ import pandas as pd
 from config.config import DATABASE_PATH
 
 logger = logging.getLogger(__name__)
+MAX_RESULT_ROWS = 1000
 
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
@@ -14,18 +15,37 @@ pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', None)
 
 
-def execute_sql_query(sql_query):
+def _limited_sql_query(sql_query, max_rows):
+    normalized_query = sql_query.strip().rstrip(";")
+
+    return (
+        "SELECT * FROM ("
+        f"{normalized_query}"
+        ") AS limited_query_result "
+        f"LIMIT {int(max_rows)}"
+    )
+
+
+def execute_sql_query(sql_query, max_rows=MAX_RESULT_ROWS):
     try:
         logger.info("Executing SQL query against database: %s", DATABASE_PATH)
         logger.info("SQL query: %s", sql_query)
+        logger.info("Maximum rows returned: %s", max_rows)
 
-        conn = sqlite3.connect(DATABASE_PATH)
+        execution_query = _limited_sql_query(
+            sql_query,
+            max_rows
+        )
 
-        start_time = time.time()
+        with sqlite3.connect(DATABASE_PATH) as conn:
+            start_time = time.time()
 
-        result = pd.read_sql_query(sql_query, conn)
+            result = pd.read_sql_query(
+                execution_query,
+                conn
+            )
 
-        end_time = time.time()
+            end_time = time.time()
 
         execution_time = end_time - start_time
 
@@ -33,8 +53,6 @@ def execute_sql_query(sql_query):
             "Query execution time: %.4f seconds",
             execution_time
         )
-
-        conn.close()
 
         return result
 

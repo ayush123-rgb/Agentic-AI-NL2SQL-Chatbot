@@ -1,33 +1,67 @@
+import re
+
 from modules.chat_history import INTERNAL_TABLES
 
 
-def validate_sql_query(sql_query):
-    if not sql_query.strip().upper().startswith("SELECT"):
+BLOCKED_SQL_KEYWORDS = (
+    "DELETE",
+    "DROP",
+    "UPDATE",
+    "ALTER",
+    "INSERT",
+    "TRUNCATE",
+    "CREATE",
+    "REPLACE"
+)
+
+DESTRUCTIVE_USER_PATTERNS = (
+    r"\b(delete|drop|truncate|alter|insert|update|replace)\b",
+    (
+        r"\b(remove|erase|destroy)\b.*"
+        r"\b(table|database|data|rows?|records?|payments?|orders?|"
+        r"products?|customers?|order items?)\b"
+    ),
+    r"\bcreate\b.*\b(table|database|index)\b"
+)
+
+
+def validate_user_query(user_query):
+    normalized_query = str(user_query or "").strip()
+
+    if not normalized_query:
         return False
 
-    blocked_keywords = [
+    return not any(
+        re.search(pattern, normalized_query, re.IGNORECASE)
+        for pattern in DESTRUCTIVE_USER_PATTERNS
+    )
 
-        "DELETE",
-        "DROP",
-        "UPDATE",
-        "ALTER",
-        "INSERT",
-        "TRUNCATE",
-        "CREATE",
-        "REPLACE"
 
-    ]
+def validate_sql_query(sql_query):
+    normalized_query = str(sql_query or "").strip()
 
-    sql_upper = sql_query.upper()
+    if not normalized_query.upper().startswith("SELECT"):
+        return False
+
+    query_without_final_semicolon = normalized_query.rstrip(";")
+
+    if ";" in query_without_final_semicolon:
+        return False
 
     for table_name in INTERNAL_TABLES:
-        if table_name.upper() in sql_upper:
+        if re.search(
+            rf"\b{re.escape(table_name)}\b",
+            normalized_query,
+            re.IGNORECASE
+        ):
             return False
 
-    for keyword in blocked_keywords:
-
-        if keyword in sql_upper:
-
+    for keyword in BLOCKED_SQL_KEYWORDS:
+        if re.search(
+            rf"\b{keyword}\b",
+            normalized_query,
+            re.IGNORECASE
+        ):
             return False
 
     return True

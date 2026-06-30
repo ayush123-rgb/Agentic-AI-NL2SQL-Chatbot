@@ -10,7 +10,8 @@ from modules.sql_generator import (
 )
 
 from modules.query_validator import (
-    validate_sql_query
+    validate_sql_query,
+    validate_user_query
 )
 
 from modules.query_executor import (
@@ -93,12 +94,43 @@ def route_query(user_query, session_id=None):
             changed_context
         )
 
+    if not validate_user_query(user_query):
+        output = "Unsafe database modification request blocked"
+
+        logger.warning(
+            "Unsafe user request blocked before SQL generation: %s",
+            user_query
+        )
+
+        _save_turn(
+            resolved_session_id,
+            user_query,
+            output,
+            "NO_SQL_GENERATED_UNSAFE_INTENT",
+            session_context
+        )
+
+        return {
+            "error": output,
+            "session_id": resolved_session_id,
+            "context": _context_payload(
+                session_context
+            )
+        }
+
     # ---------------------------------------
     # SEMANTIC MEMORY CHECK
     # ---------------------------------------
-    memory_match = find_similar_query(
-        user_query
-    )
+    memory_match = None
+
+    try:
+        memory_match = find_similar_query(
+            user_query
+        )
+    except Exception:
+        logger.exception(
+            "Semantic memory lookup failed; continuing without memory"
+        )
 
     if memory_match:
 
@@ -107,19 +139,16 @@ def route_query(user_query, session_id=None):
             memory_match["similarity"]
         )
 
-        return {
-            "question": user_query,
-            "generated_sql": memory_match["sql"],
-            "summary": memory_match["response"],
-            "memory_hit": True,
-            "similarity": memory_match["similarity"],
-            "session_id": resolved_session_id,
-            "context": _context_payload(
-                session_context
-            )
-        }
+        sql_query = memory_match["sql"]
+        memory_hit = True
+        similarity = memory_match["similarity"]
+    else:
+        memory_hit = False
+        similarity = None
 
     if (
+        not memory_hit
+        and
         not session_context
         and needs_context_clarification(user_query)
     ):
@@ -142,19 +171,48 @@ def route_query(user_query, session_id=None):
             "context": None
         }
 
-    logger.info(
-        "STEP 1: Generating SQL query"
-    )
+    if not memory_hit:
+        logger.info(
+            "STEP 1: Generating SQL query"
+        )
 
-    sql_query = generate_sql_query(
-        user_query,
-        session_context=session_context
-    )
+        try:
+            sql_query = generate_sql_query(
+                user_query,
+                session_context=session_context
+            )
+        except Exception:
+            logger.exception(
+                "SQL generation failed"
+            )
 
-    logger.info(
-        "Generated SQL query: %s",
-        sql_query
-    )
+            output = "Unable to generate SQL query"
+
+            _save_turn(
+                resolved_session_id,
+                user_query,
+                output,
+                "NO_SQL_GENERATED_ERROR",
+                session_context
+            )
+
+            return {
+                "error": output,
+                "session_id": resolved_session_id,
+                "context": _context_payload(
+                    session_context
+                )
+            }
+
+        logger.info(
+            "Generated SQL query: %s",
+            sql_query
+        )
+    else:
+        logger.info(
+            "Reusing cached SQL query: %s",
+            sql_query
+        )
 
     logger.info(
         "STEP 2: Validating SQL query"
@@ -261,12 +319,21 @@ def route_query(user_query, session_id=None):
         "STEP 4: Generating chatbot response"
     )
 
-    final_response = generate_response(
-        user_query,
-        sql_query,
-        result,
-        session_context=session_context
-    )
+    try:
+        final_response = generate_response(
+            user_query,
+            sql_query,
+            result,
+            session_context=session_context
+        )
+    except Exception:
+        logger.exception(
+            "Response generation failed"
+        )
+
+        final_response = (
+            "Query executed successfully. Review the returned data."
+        )
 
     logger.info(
         "Chatbot response generated successfully"
@@ -283,18 +350,21 @@ def route_query(user_query, session_id=None):
     # ---------------------------------------
     # SAVE TO QUERY MEMORY
     # ---------------------------------------
-    save_query_memory(
-        session_uid=resolved_session_id,
-        user_input=user_query,
-        generated_sql=sql_query,
-        output_response=final_response
-    )
+    if not memory_hit:
+        save_query_memory(
+            session_uid=resolved_session_id,
+            user_input=user_query,
+            generated_sql=sql_query,
+            output_response=final_response
+        )
 
     return {
         "question": user_query,
         "generated_sql": sql_query,
         "summary": final_response,
         "records_found": len(result),
+        "memory_hit": memory_hit,
+        "similarity": similarity,
         "session_id": resolved_session_id,
         "context": _context_payload(
             session_context

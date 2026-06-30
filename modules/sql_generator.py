@@ -41,6 +41,9 @@ IMPORTANT RULES:
 17. If the current user question explicitly mentions a table or topic,
     prioritize that new topic over the previous context.
 18. Do not query internal backend tables used for chatbot history.
+19. Never reinterpret a destructive request as a SELECT query.
+20. If the user asks to delete, drop, update, alter, insert, truncate,
+    create, or replace database data, return exactly: UNSAFE_REQUEST
 
 DATABASE SCHEMA:
 

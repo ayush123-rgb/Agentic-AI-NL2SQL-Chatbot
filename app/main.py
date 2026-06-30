@@ -17,3 +17,11 @@ def get_status():
     return {
         "message": "Agentic AI NL to SQL Chatbot Running"
     }
+
+'''
+SELECT VAG(payment_values) FROM payments;
+
+What is the average payment value?
+
+uvicorn app.main:app --reload
+'''
